@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sevencat.ai.yolo", "sevencat.ai.yolo\sevencat.ai.yolo.csproj", "{46839E5A-9B92-4464-A748-E886C461BB25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46839E5A-9B92-4464-A748-E886C461BB25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46839E5A-9B92-4464-A748-E886C461BB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46839E5A-9B92-4464-A748-E886C461BB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46839E5A-9B92-4464-A748-E886C461BB25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
