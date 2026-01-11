@@ -12,6 +12,7 @@ namespace sevencat.ai.yolo;
 
 public class YoloDetect11 : YoloDetect
 {
+	
 	public YoloDetect11(YoloConfiguration config, byte[] modeldata) : base(config, modeldata)
 	{
 	}
@@ -39,7 +40,7 @@ public class YoloDetect11 : YoloDetect
 		var output0 = results[0].AsTensor<float>().ToDenseTensor();
 		var otensor = new MemoryTensor<float>(output0.Buffer, [.. output0.Dimensions]);
 		{
-			List<RawBoundingBox> resultItems = new List<RawBoundingBox>();
+			List<RawBoundingBox> rawBoundingBoxes = new List<RawBoundingBox>();
 			var boxStride = otensor.Strides[1];
 			var boxesCount = otensor.Dimensions[2];
 			var namesCount = _metadata.Names.Length;
@@ -73,12 +74,30 @@ public class YoloDetect11 : YoloDetect
 						Bounds = bounds,
 						Angle = angle
 					};
-					resultItems.Add(curitem);
+					rawBoundingBoxes.Add(curitem);
 				}
 			}
 
-			var boxspan = CollectionsMarshal.AsSpan(resultItems);
+			var boxspan = CollectionsMarshal.AsSpan(rawBoundingBoxes);
 			var x2=NonMaxSuppressionUtil.Apply(boxspan, _config.IoU);
+			var imageAdjustment=new ImageAdjustmentHelper(_metadata);
+
+			var size = image.Size;
+			var adjustment = imageAdjustment.Calculate(size);
+
+			var result = new DetectionResultItem[boxes.Length];
+
+			for (var i = 0; i < boxes.Length; i++)
+			{
+				var box = boxes[i];
+
+				result[i] = new Detection
+				{
+					Name = metadata.Names[box.NameIndex],
+					Bounds = imageAdjustment.Adjust(box.Bounds, adjustment),
+					Confidence = box.Confidence,
+				};
+			}
 			return null;
 		}
 	}

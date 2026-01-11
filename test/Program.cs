@@ -22,6 +22,7 @@ class Program
 		var modeldat = File.ReadAllBytes(model);
 		var config = new YoloConfiguration();
 		config.Confidence = 0.8f;
+		config.UseCuda = false;
 		var yolo = new YoloDetect11(config, modeldat);
 		var img = Image.Load(imgfile);
 		using var img2 = img.CloneAs<Rgb24>();
