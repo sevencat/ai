@@ -9,7 +9,6 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu.Windows" Version="1.23.2" />
-      <PackageReference Include="YoloSharp.Gpu" Version="6.0.7" />
     </ItemGroup>
 
     <ItemGroup>

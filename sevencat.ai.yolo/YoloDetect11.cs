@@ -12,7 +12,6 @@ namespace sevencat.ai.yolo;
 
 public class YoloDetect11 : YoloDetect
 {
-	
 	public YoloDetect11(YoloConfiguration config, byte[] modeldata) : base(config, modeldata)
 	{
 	}
@@ -44,7 +43,7 @@ public class YoloDetect11 : YoloDetect
 			var boxStride = otensor.Strides[1];
 			var boxesCount = otensor.Dimensions[2];
 			var namesCount = _metadata.Names.Length;
-			
+
 			var tensorSpan = otensor.Buffer.Span;
 			for (var boxIndex = 0; boxIndex < boxesCount; boxIndex++)
 			{
@@ -63,10 +62,9 @@ public class YoloDetect11 : YoloDetect
 					{
 						continue;
 					}
-					
-					
 
-					RawBoundingBox curitem= new RawBoundingBox
+
+					RawBoundingBox curitem = new RawBoundingBox
 					{
 						Index = boxIndex,
 						NameIndex = nameIndex,
@@ -79,31 +77,30 @@ public class YoloDetect11 : YoloDetect
 			}
 
 			var boxspan = CollectionsMarshal.AsSpan(rawBoundingBoxes);
-			var x2=NonMaxSuppressionUtil.Apply(boxspan, _config.IoU);
-			var imageAdjustment=new ImageAdjustmentHelper(_metadata);
+			var boxes = NonMaxSuppressionUtil.Apply(boxspan, _config.IoU);
+			var imageAdjustment = new ImageAdjustmentHelper(_metadata);
 
 			var size = image.Size;
 			var adjustment = imageAdjustment.Calculate(size);
 
-			var result = new DetectionResultItem[boxes.Length];
-
-			for (var i = 0; i < boxes.Length; i++)
+			var result = new List<DetectionResultItem>();
+			foreach (var box in boxes)
 			{
-				var box = boxes[i];
-
-				result[i] = new Detection
+				result.Add(new DetectionResultItem
 				{
-					Name = metadata.Names[box.NameIndex],
+					Name = _metadata.Names[box.NameIndex],
 					Bounds = imageAdjustment.Adjust(box.Bounds, adjustment),
 					Confidence = box.Confidence,
-				};
+				});
 			}
-			return null;
+
+			return result;
 		}
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	protected virtual void ParseBox(Span<float> tensor, int boxStride, int boxIndex, out RectangleF bounds, out float angle)
+	protected virtual void ParseBox(Span<float> tensor, int boxStride, int boxIndex, out RectangleF bounds,
+		out float angle)
 	{
 		var x = tensor[0 + boxIndex];
 		var y = tensor[1 * boxStride + boxIndex];
@@ -114,7 +111,7 @@ public class YoloDetect11 : YoloDetect
 
 		angle = float.NegativeZero;
 	}
-	
+
 	private Image<Rgb24> ResizeImage(Image<Rgb24> image, out Vector<int> padding)
 	{
 		// Get the model image input size
