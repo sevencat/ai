@@ -16,6 +16,58 @@ public class YoloDetect11 : YoloDetect
 	{
 	}
 
+	public List<RawBoundingBox> ParseRawBoundBox(Span<float> tensorSpan)
+	{
+		List<RawBoundingBox> rawBoundingBoxes = new List<RawBoundingBox>();
+		var outputmeta = _session.OutputMetadata.First().Value;
+		rawBoundingBoxes.Capacity = outputmeta.Dimensions[1] * outputmeta.Dimensions[2];
+
+		var boxStride = outputmeta.Dimensions[2];
+		var boxesCount = outputmeta.Dimensions[2];
+		var namesCount = _metadata.Names.Length;
+
+		for (var boxIndex = 0; boxIndex < boxesCount; boxIndex++)
+		{
+			//这里先解析这个box!!!
+			var x = tensorSpan[0 * boxStride + boxIndex];
+			var y = tensorSpan[1 * boxStride + boxIndex];
+			var w = tensorSpan[2 * boxStride + boxIndex];
+			var h = tensorSpan[3 * boxStride + boxIndex];
+
+			var bounds = new RectangleF(x - w / 2, y - h / 2, w, h);
+			if (bounds.Width == 0 || bounds.Height == 0)
+			{
+				continue;
+			}
+
+			var angle = float.NegativeZero;
+
+			//再识别每个nameindex，后面80个8400每个都是置信度
+			for (var nameIndex = 0; nameIndex < namesCount; nameIndex++)
+			{
+				var confidence = tensorSpan[(nameIndex + 4) * boxStride + boxIndex];
+				if (confidence <= _config.Confidence)
+				{
+					continue;
+				}
+
+				RawBoundingBox curitem = new RawBoundingBox
+				{
+					Index = boxIndex,
+					NameIndex = nameIndex,
+					Confidence = confidence,
+					Bounds = bounds,
+					Angle = angle
+				};
+				rawBoundingBoxes.Add(curitem);
+			}
+		}
+
+		var boxspan = CollectionsMarshal.AsSpan(rawBoundingBoxes);
+		var boxes = NonMaxSuppressionUtil.Apply(boxspan, _config.IoU);
+		return boxes.ToList();
+	}
+
 	public override List<DetectionResultItem> Detect(Image<Rgb24> image)
 	{
 		// Resize the input image
@@ -29,73 +81,26 @@ public class YoloDetect11 : YoloDetect
 		var target = new MemoryTensor<float>(inputdata, inputmetadata.Dimensions);
 		ImageUtil.NormalizerPixelsToTensor(resized, target, padding);
 
+		var outputmetadata = _session.OutputMetadata["output0"];
+		var outputlen = outputmetadata.GetShapeLen();
+		var outputdat = new float[outputlen];
+		var output0 = new DenseTensor<float>(outputdat, outputmetadata.Dimensions);
 		//只有这个地方需要锁！！！
-		using var results = _session.Run(new List<NamedOnnxValue>
+		_session.Run([NamedOnnxValue.CreateFromTensor("images", input0)],
+			[NamedOnnxValue.CreateFromTensor("output0", output0)]
+		);
+
+		var boxes = ParseRawBoundBox(new Span<float>(outputdat));
+		var imageAdjustment = new ImageAdjustmentHelper(_metadata);
+		var adjustment = imageAdjustment.Calculate(image.Size);
+
+		var result = boxes.Select(x => new DetectionResultItem()
 		{
-			NamedOnnxValue.CreateFromTensor("images", input0)
-		});
-
-		//把数据复制出来，因为这个数据有可能是在gpu,不在cpu!!!
-		var output0 = results[0].AsTensor<float>().ToDenseTensor();
-		var otensor = new MemoryTensor<float>(output0.Buffer, [.. output0.Dimensions]);
-		{
-			List<RawBoundingBox> rawBoundingBoxes = new List<RawBoundingBox>();
-			var boxStride = otensor.Strides[1];
-			var boxesCount = otensor.Dimensions[2];
-			var namesCount = _metadata.Names.Length;
-
-			var tensorSpan = otensor.Buffer.Span;
-			for (var boxIndex = 0; boxIndex < boxesCount; boxIndex++)
-			{
-				for (var nameIndex = 0; nameIndex < namesCount; nameIndex++)
-				{
-					var confidence = tensorSpan[(nameIndex + 4) * boxStride + boxIndex];
-
-					if (confidence <= _config.Confidence)
-					{
-						continue;
-					}
-
-					ParseBox(tensorSpan, boxStride, boxIndex, out var bounds, out var angle);
-
-					if (bounds.Width == 0 || bounds.Height == 0)
-					{
-						continue;
-					}
-
-
-					RawBoundingBox curitem = new RawBoundingBox
-					{
-						Index = boxIndex,
-						NameIndex = nameIndex,
-						Confidence = confidence,
-						Bounds = bounds,
-						Angle = angle
-					};
-					rawBoundingBoxes.Add(curitem);
-				}
-			}
-
-			var boxspan = CollectionsMarshal.AsSpan(rawBoundingBoxes);
-			var boxes = NonMaxSuppressionUtil.Apply(boxspan, _config.IoU);
-			var imageAdjustment = new ImageAdjustmentHelper(_metadata);
-
-			var size = image.Size;
-			var adjustment = imageAdjustment.Calculate(size);
-
-			var result = new List<DetectionResultItem>();
-			foreach (var box in boxes)
-			{
-				result.Add(new DetectionResultItem
-				{
-					Name = _metadata.Names[box.NameIndex],
-					Bounds = imageAdjustment.Adjust(box.Bounds, adjustment),
-					Confidence = box.Confidence,
-				});
-			}
-
-			return result;
-		}
+			Name = _metadata.Names[x.NameIndex],
+			Bounds = imageAdjustment.Adjust(x.Bounds, adjustment),
+			Confidence = x.Confidence,
+		}).ToList();
+		return result;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
