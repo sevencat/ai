@@ -14,7 +14,7 @@ class Program
 	{
 		var outputdir = AppDomain.CurrentDomain.BaseDirectory;
 
-		var model = Path.Combine(mdlpath, "yolov11s.onnx");
+		var model = Path.Combine(mdlpath, "yolov8s.onnx");
 		var imgfile = Path.Combine(imgpath, "sports.jpg");
 
 		var modeldat = File.ReadAllBytes(model);
