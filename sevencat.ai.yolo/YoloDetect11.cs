@@ -86,9 +86,13 @@ public class YoloDetect11 : YoloDetect
 		var outputdat = new float[outputlen];
 		var output0 = new DenseTensor<float>(outputdat, outputmetadata.Dimensions);
 		//只有这个地方需要锁！！！
-		_session.Run([NamedOnnxValue.CreateFromTensor("images", input0)],
-			[NamedOnnxValue.CreateFromTensor("output0", output0)]
-		);
+
+		lock (this)
+		{
+			_session.Run([NamedOnnxValue.CreateFromTensor("images", input0)],
+				[NamedOnnxValue.CreateFromTensor("output0", output0)]
+			);
+		}
 
 		var boxes = ParseRawBoundBox(new Span<float>(outputdat));
 		var imageAdjustment = new ImageAdjustmentHelper(_metadata);
