@@ -35,7 +35,7 @@ public class Sam3Infer
 
 	//驾驶仓，指挥调度，事件上报，事件处理，数据接口，直接用一个mqtt，数据管理平台,业务数据集成（对象库），业务管理平台要修改，数据管理平台
 	//业务管理平台 审批模块（渣土，广告监管模块，派遣 指挥调度
-	//两个子模块，渣土 停车 
+	//两个子模块，渣土 停车 优先弄好。 
 	//1、信创改造，包括审批模块和广告监管模块，整体推进，小程序，云，改进。
 	//2.渣土和停车的推进。涉及云城管切割
 	//3.数据对接 所有的都放在数据平台!!!   渣土 广告相关的也放数据平台，放到数据平台。数据库直连！！！不用中间层接口了。
@@ -56,8 +56,9 @@ public class Sam3Infer
 	{
 		lock (this)
 		{
-			EncodeImage(session);
 			EncodeText(session);
+			EncodeImage(session);
+			
 			Decode(session);
 			session.GCInput();
 			var result = PostProcessor(session);
@@ -246,13 +247,28 @@ public class Sam3Infer
 			text_attention_mask[i] = 0;
 		var text_input_ids_tensor = new DenseTensor<long>(text_input_ids, [8, 32]);
 		var text_attention_mask_tensor = new DenseTensor<long>(text_attention_mask, [8, 32]);
-		using var results = _text_encoder.Run(new List<NamedOnnxValue>
-		{
+
+		// var output_text_feature_metadata = _text_encoder.OutputMetadata["text_features"];
+		// var text_featuresdat = new float[output_text_feature_metadata.GetShapeLen()];
+		// session.text_features = new DenseTensor<float>(text_featuresdat, output_text_feature_metadata.CloneDeimension());
+		//
+		// var output_text_mask_metadata=_text_encoder.OutputMetadata["text_mask"];
+		// var text_mask_dat=new bool[output_text_mask_metadata.GetShapeLen()];
+		// session.text_mask = new DenseTensor<bool>(text_mask_dat, output_text_mask_metadata.CloneDeimension());
+		
+		 using var results=_text_encoder.Run([
 			NamedOnnxValue.CreateFromTensor("input_ids", text_input_ids_tensor),
-			NamedOnnxValue.CreateFromTensor("attention_mask", text_attention_mask_tensor),
-		});
+			NamedOnnxValue.CreateFromTensor("attention_mask", text_attention_mask_tensor)
+			]
+			//  ,
+			// [
+			// 	NamedOnnxValue.CreateFromTensor("text_features", session.text_features),
+			// 	NamedOnnxValue.CreateFromTensor("text_mask", session.text_mask),
+			// ]
+		);
 		session.text_features = results.First().AsTensor<float>().ToDenseTensor();
 		session.text_mask = results[1].AsTensor<bool>().ToDenseTensor();
+		return;
 	}
 
 	//计算出缩放后宽高,实际图像为固定,这个是从左上角开始的宽高
@@ -261,7 +277,7 @@ public class Sam3Infer
 		var modelimgratio = (decimal)input_image_width_ / (decimal)input_image_height_;
 		var curration = (decimal)width / (decimal)height;
 		if (curration >= modelimgratio)
-		{
+		{ 
 			var ratio = (decimal)width / (decimal)input_image_width_;
 			var h = (int)(height / ratio);
 			if (h > input_image_height_)

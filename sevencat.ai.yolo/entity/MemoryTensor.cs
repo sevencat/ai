@@ -42,12 +42,13 @@ public class MemoryTensor<T> where T : unmanaged
 
 		for (int i = 0; i < dimensions.Length; i++)
 		{
-			if (dimensions[i] < 0)
+			var cursize = dimensions[i];
+			if (cursize < 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(dimensions), "Dimensions must be non-negative");
+				cursize = 1;
 			}
 
-			size *= dimensions[i];
+			size *= cursize;
 		}
 
 		if (size != buffer.Length)
