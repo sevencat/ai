@@ -5,7 +5,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
-namespace sevencat.ai.yolo;
+namespace sevencat.ai.sam;
 
 public class Sam3Session : IDisposable
 {

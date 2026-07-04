@@ -1,7 +1,7 @@
 ﻿using Microsoft.ML.OnnxRuntime;
 using SixLabors.ImageSharp;
 
-namespace sevencat.ai.yolo.entity;
+namespace sevencat.ai.entity;
 
 public class YoloMetadata
 {

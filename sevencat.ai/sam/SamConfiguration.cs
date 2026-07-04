@@ -1,4 +1,4 @@
-﻿namespace sevencat.ai.yolo;
+﻿namespace sevencat.ai.sam;
 
 public class SamConfiguration
 {

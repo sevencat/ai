@@ -1,6 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 
-namespace sevencat.ai.yolo;
+namespace sevencat.ai.sam;
 
 public class Sam3ResultItem
 {

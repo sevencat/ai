@@ -1,7 +1,5 @@
 ﻿using Microsoft.ML.OnnxRuntime;
-using sevencat.ai.yolo.entity;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using sevencat.ai.entity;
 
 namespace sevencat.ai.yolo;
 

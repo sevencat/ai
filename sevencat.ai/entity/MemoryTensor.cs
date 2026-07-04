@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace sevencat.ai.yolo.entity;
+namespace sevencat.ai.entity;
 
 public class MemoryTensor<T> where T : unmanaged
 {

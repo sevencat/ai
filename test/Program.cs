@@ -1,11 +1,7 @@
-﻿using sevencat.ai.yolo;
-using sevencat.ai.yolo.entity;
-using sevencat.ai.yolo.util;
-using SixLabors.Fonts;
+﻿using sevencat.ai.sam;
+using sevencat.ai.yolo;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Processing;
 using YoloConfiguration = sevencat.ai.yolo.YoloConfiguration;
 
 namespace test;

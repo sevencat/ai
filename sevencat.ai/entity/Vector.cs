@@ -1,4 +1,4 @@
-﻿namespace sevencat.ai.yolo.entity;
+﻿namespace sevencat.ai.entity;
 
 public readonly struct Vector<T>(T x, T y)
 {

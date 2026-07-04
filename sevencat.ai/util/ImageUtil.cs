@@ -1,10 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
-using sevencat.ai.yolo.entity;
+using sevencat.ai.entity;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace sevencat.ai.yolo.util;
+namespace sevencat.ai.util;
 
 public class ImageUtil
 {

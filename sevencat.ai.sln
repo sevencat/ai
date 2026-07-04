@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sevencat.ai.yolo", "sevencat.ai.yolo\sevencat.ai.yolo.csproj", "{46839E5A-9B92-4464-A748-E886C461BB25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sevencat.ai", "sevencat.ai\sevencat.ai.csproj", "{46839E5A-9B92-4464-A748-E886C461BB25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{3D3831BF-DE0A-4BAA-AE21-DA25B2AE9088}"
 EndProject

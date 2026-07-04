@@ -1,5 +1,4 @@
-﻿using sevencat.ai.yolo.entity;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace sevencat.ai.yolo;

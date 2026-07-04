@@ -1,7 +1,7 @@
-﻿using sevencat.ai.yolo.entity;
+﻿using sevencat.ai.entity;
 using SixLabors.ImageSharp;
 
-namespace sevencat.ai.yolo.util;
+namespace sevencat.ai.util;
 
 public class ImageAdjustmentHelper(YoloMetadata metadata)
 {

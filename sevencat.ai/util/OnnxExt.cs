@@ -1,6 +1,6 @@
 ﻿using Microsoft.ML.OnnxRuntime;
 
-namespace sevencat.ai.yolo.util;
+namespace sevencat.ai.util;
 
 public static class OnnxExt
 {

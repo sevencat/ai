@@ -1,13 +1,13 @@
 ﻿using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using sevencat.ai.yolo.entity;
-using sevencat.ai.yolo.util;
+using sevencat.ai.entity;
+using sevencat.ai.util;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Tokenizers.DotNet;
 using Size = SixLabors.ImageSharp.Size;
 
-namespace sevencat.ai.yolo;
+namespace sevencat.ai.sam;
 
 public class Sam3Infer
 {

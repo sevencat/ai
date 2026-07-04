@@ -1,61 +1,73 @@
-﻿using sevencat.ai.yolo.entity;
+﻿using sevencat.ai.entity;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 
-namespace sevencat.ai.yolo.util;
+namespace sevencat.ai.util;
 
 public static class ImageExt
 {
+	#region 通用
+
 	//JpegEncoder encoder
-	public static string ToBase64JpgUrl(this Image img, JpegEncoder encoder)
+	public static async Task<string> ToBase64UrlAsync(this Image img, IImageFormat imgfmt)
 	{
-		var binjpegimg = img.ToJpegImage(encoder);
-		var imgurl = "data:image/jpeg;base64," + Convert.ToBase64String(binjpegimg);
+		var binjpegimg = await img.ToBinImageAsync(imgfmt);
+		var imgurl = "data:" + imgfmt.DefaultMimeType + ";base64," + Convert.ToBase64String(binjpegimg);
 		return imgurl;
 	}
 
-	public static byte[] ToJpegImage(this Image img, JpegEncoder encoder)
+	public static string ToBase64Url(this Image img, IImageFormat imgfmt)
+	{
+		var binjpegimg = img.ToBinImage(imgfmt);
+		var imgurl = "data:" + imgfmt.DefaultMimeType + ";base64," + Convert.ToBase64String(binjpegimg);
+		return imgurl;
+	}
+
+	public static byte[] ToBinImage(this Image img, IImageFormat encoder)
 	{
 		using (var ms = new MemoryStream())
 		{
-			img.SaveAsJpeg(ms, encoder);
+			img.Save(ms, encoder);
 			return ms.ToArray();
 		}
 	}
 
-	public static async Task<string> ToBase64JpgUrl(this Image img)
+	public static async Task<byte[]> ToBinImageAsync(this Image img, IImageFormat encoder)
 	{
-		var binjpegimg = await img.ToJpegImage();
-		var imgurl = "data:image/jpeg;base64," + Convert.ToBase64String(binjpegimg);
-		return imgurl;
+		using (var ms = new MemoryStream())
+		{
+			await img.SaveAsync(ms, encoder);
+			return ms.ToArray();
+		}
+	}
+
+	#endregion
+
+	public static async Task<string> ToBase64JpgUrlAsync(this Image img)
+	{
+		return await img.ToBase64UrlAsync(JpegFormat.Instance);
+	}
+
+	public static async Task<string> ToBase64PngUrlAsync(this Image img)
+	{
+		return await img.ToBase64UrlAsync(PngFormat.Instance);
+	}
+
+	public static string ToBase64JpgUrl(this Image img)
+	{
+		return img.ToBase64Url(JpegFormat.Instance);
 	}
 
 	public static string ToBase64PngUrl(this Image img)
 	{
-		return img.ToBase64String(PngFormat.Instance);
+		return img.ToBase64Url(PngFormat.Instance);
 	}
 
-	public static async Task<byte[]> ToPngImage(this Image img)
-	{
-		using (var ms = new MemoryStream())
-		{
-			await img.SaveAsPngAsync(ms);
-			return ms.ToArray();
-		}
-	}
-
-	public static async Task<byte[]> ToJpegImage(this Image img)
-	{
-		using (var ms = new MemoryStream())
-		{
-			await img.SaveAsJpegAsync(ms);
-			return ms.ToArray();
-		}
-	}
 
 	public static void PlotImage(this Image img, List<DetectionResultItem> bbitems, string fontname = "Arial")
 	{
