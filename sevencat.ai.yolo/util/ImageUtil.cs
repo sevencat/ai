@@ -81,4 +81,6 @@ public class ImageUtil
 		target[index + strideBatchG - strideBatchR] = pixel.G / 255f;
 		target[index + strideBatchB - strideBatchR] = pixel.B / 255f;
 	}
+	
+	
 }

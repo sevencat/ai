@@ -15,4 +15,7 @@ public class YoloConfiguration
 	/// Specify the minimum IoU value for Non-Maximum Suppression (NMS). Default is 0.45f.
 	/// </summary>
 	public float IoU { get; set; } = .45f;
+
+	public int IntraOpNumThreads { get; set; } = -1;
+	public int InterOpNumThreads { get; set; } = -1;
 }

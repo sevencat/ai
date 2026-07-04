@@ -15,6 +15,10 @@ public abstract class YoloBase
 	{
 		_config = config;
 		var sessionopt = CreateSessionOptions(config);
+		if (config.IntraOpNumThreads > 0)
+			sessionopt.IntraOpNumThreads = config.IntraOpNumThreads;
+		if (config.InterOpNumThreads > 0)
+			sessionopt.InterOpNumThreads = config.InterOpNumThreads;
 		_session = new InferenceSession(modeldata, sessionopt);
 		_metadata = new YoloMetadata();
 		_metadata.ParseFrom(_session.ModelMetadata);
@@ -27,6 +31,4 @@ public abstract class YoloBase
 			return SessionOptions.MakeSessionOptionWithCudaProvider(config.CudaDeviceId);
 		return new SessionOptions();
 	}
-
-	
 }
