@@ -96,8 +96,8 @@ public static class AiChatUtil
 		var message = new ChatMessage(ChatRole.User, new List<AIContent>
 		{
 			new TextContent(cp.UserPrompt),
-			new DataContent(new Uri(imgurl1)),
-			new DataContent(new Uri(imgurl2)),
+			new DataContent(imgurl1,imgfmt.DefaultMimeType),
+			new DataContent(imgurl2,imgfmt.DefaultMimeType),
 		});
 		msgs.Add(message);
 
