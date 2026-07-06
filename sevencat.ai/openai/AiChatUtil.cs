@@ -190,7 +190,11 @@ public static class AiChatUtil
 	{
 		msg = msg.Trim();
 		var ret = new AiTagAnalyzeRet();
-		msg = msg.Trim().Substring(JSONPREFIX.Length + 1, msg.Length - JSONPREFIX.Length - JSONPOST.Length - 2);
+		if (!msg.StartsWith("{"))
+		{
+			msg = msg.Trim().Substring(JSONPREFIX.Length + 1, msg.Length - JSONPREFIX.Length - JSONPOST.Length - 2);
+		}
+
 		var jsonmsg = msg.FromJson<Dictionary<string, object>>();
 		foreach (var tag in tags)
 		{
