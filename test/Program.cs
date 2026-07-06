@@ -106,6 +106,6 @@ class Program
 
 	static void Main(string[] args)
 	{
-		TestOpenAi2();
+		TestYolo();
 	}
 }

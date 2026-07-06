@@ -22,6 +22,10 @@ public abstract class YoloBase
 		_metadata.ParseFrom(_session.ModelMetadata);
 	}
 
+	public YoloName[] YoloNames()
+	{
+		return _metadata.Names;
+	}
 
 	protected SessionOptions CreateSessionOptions(YoloConfiguration config)
 	{

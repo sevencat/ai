@@ -96,9 +96,60 @@ public static class AiChatUtil
 		var message = new ChatMessage(ChatRole.User, new List<AIContent>
 		{
 			new TextContent(cp.UserPrompt),
-			new DataContent(imgurl1,imgfmt.DefaultMimeType),
-			new DataContent(imgurl2,imgfmt.DefaultMimeType),
+			new DataContent(imgurl1, imgfmt.DefaultMimeType),
+			new DataContent(imgurl2, imgfmt.DefaultMimeType),
 		});
+		msgs.Add(message);
+
+		var options = new ChatOptions
+		{
+			Temperature = 0f,
+		};
+		if (enablethink != null)
+		{
+			options.AdditionalProperties = new()
+			{
+				{ "enable_thinking", enablethink.Value }
+			};
+		}
+
+		try
+		{
+			var resp = await chatclient.GetResponseAsync(msgs, options);
+			var retmsg = resp.Text;
+			Log.Info("ai返回:{0}", retmsg);
+			return Analyze(retmsg, cp.Tags);
+		}
+		catch (Exception ex)
+		{
+			Log.Error(ex);
+			return null;
+		}
+	}
+
+
+	public static async Task<AiTagAnalyzeRet> Analyze(this IChatClient chatclient, Image[] imgdata,
+		ChatPromptBase cp, bool? enablethink = false)
+	{
+		var fmt = JpegFormat.Instance;
+		return await chatclient.Analyze(imgdata, cp, fmt, enablethink);
+	}
+
+	public static async Task<AiTagAnalyzeRet> Analyze(this IChatClient chatclient, Image[] imgdata,
+		ChatPromptBase cp, IImageFormat imgfmt, bool? enablethink = false)
+	{
+		var msgs = new List<ChatMessage>();
+		if (cp.SysPrompt.IsNotNullOrWhiteSpace())
+			msgs.Add(new ChatMessage(ChatRole.System, cp.SysPrompt));
+
+		var aictx = new List<AIContent>() { new TextContent(cp.UserPrompt) };
+		foreach (var img in imgdata)
+		{
+			var imgurl = await img.ToBase64UrlAsync(imgfmt);
+			aictx.Add(new DataContent(imgurl, imgfmt.DefaultMimeType));
+		}
+
+		var message = new ChatMessage(ChatRole.User, aictx);
 		msgs.Add(message);
 
 		var options = new ChatOptions
